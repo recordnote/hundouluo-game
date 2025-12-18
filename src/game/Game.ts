@@ -72,6 +72,7 @@ export class Game {
 
   stop() {
     this.isRunning = false;
+    Input.cleanup();
   }
 
   loop = (currentTime: number) => {
@@ -112,7 +113,8 @@ export class Game {
     this.entities = this.entities.filter(e => e.active);
 
     // Collisions
-    CollisionSystem.update(this.entities);
+    const scoreGained = CollisionSystem.update(this.entities);
+    this.score += scoreGained;
 
     // Check Player Death
     if (this.player && this.player.hp <= 0) {

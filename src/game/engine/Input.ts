@@ -2,14 +2,19 @@ export class Input {
   private static keys: Set<string> = new Set();
   private static previousKeys: Set<string> = new Set();
 
-  static init() {
-    window.addEventListener('keydown', (e) => {
-      Input.keys.add(e.code);
-    });
+  private static onKeyDown = (e: KeyboardEvent) => Input.keys.add(e.code);
+  private static onKeyUp = (e: KeyboardEvent) => Input.keys.delete(e.code);
 
-    window.addEventListener('keyup', (e) => {
-      Input.keys.delete(e.code);
-    });
+  static init() {
+    window.addEventListener('keydown', Input.onKeyDown);
+    window.addEventListener('keyup', Input.onKeyUp);
+  }
+
+  static cleanup() {
+    window.removeEventListener('keydown', Input.onKeyDown);
+    window.removeEventListener('keyup', Input.onKeyUp);
+    Input.keys.clear();
+    Input.previousKeys.clear();
   }
 
   static update() {

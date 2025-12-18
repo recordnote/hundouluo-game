@@ -7,14 +7,17 @@ import { Pickup } from '../entities/Pickup';
 import { Physics } from './Physics';
 
 export class CollisionSystem {
-  static update(entities: Entity[]) {
+  // Returns total score gained this frame
+  static update(entities: Entity[]): number {
+    let scoreGained = 0;
+
     // Separate entities by type for O(N*M) instead of O(N^2)
     const player = entities.find(e => e.type === EntityType.Player) as Player;
     const enemies = entities.filter(e => e.type === EntityType.Enemy && e.active) as Enemy[];
     const bullets = entities.filter(e => e.type === EntityType.Bullet && e.active) as Bullet[];
     const pickups = entities.filter(e => e.type === EntityType.Pickup && e.active) as Pickup[];
 
-    if (!player || !player.active) return; // Game over or not spawned
+    if (!player || !player.active) return 0; // Game over or not spawned
 
     // 1. Player vs Enemy (Body Collision)
     for (const enemy of enemies) {
@@ -32,6 +35,9 @@ export class CollisionSystem {
             bullet.active = false;
             enemy.takeDamage(1);
             if (!enemy.active) {
+                // Enemy Killed
+                scoreGained += enemy.scoreValue;
+
                 // Drop chance
                 if (Math.random() < 0.3) { // 30%
                     const type = Math.random() < 0.5 ? 'S' : 'R';
@@ -62,5 +68,7 @@ export class CollisionSystem {
         }
       }
     }
+
+    return scoreGained;
   }
 }
